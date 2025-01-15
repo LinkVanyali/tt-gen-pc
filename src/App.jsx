@@ -58,7 +58,7 @@ function App() {
       days[day] = {};
       REGULAR_SCHEDULE.forEach(period => {
         if (typeof period.id === 'number') {
-          days[day][period.id] = '';
+          days[day][period.id] = 'Test Class ' + period.id;
         }
       });
     }
