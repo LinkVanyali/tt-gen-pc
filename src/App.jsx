@@ -167,6 +167,16 @@ const generateAndDownload = () => {
    
    const daySchedule = timetable[assignment.dayNumber];
    if (daySchedule) {
+     // Add all-day Day Number event
+     addSessionToCSV({
+       className: `Day ${assignment.dayNumber}`,
+       date: assignment.date,
+       startTime: '00:00',
+       endTime: '23:59',
+       description: `Day ${assignment.dayNumber}`,
+       isAllDay: true
+     });
+
      const schedule = getScheduleForDate(assignment.date);
      
      schedule.forEach(period => {
@@ -201,14 +211,15 @@ const generateAndDownload = () => {
            date: assignment.date,
            startTime: period.startTime,
            endTime: period.endTime,
-           description
+           description,
+           isAllDay: false
          });
        }
      });
    }
  });
 
- function addSessionToCSV({ className, date, startTime, endTime, description }) {
+ function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay }) {
    const formattedDate = new Date(date).toLocaleDateString('en-US', {
      month: '2-digit',
      day: '2-digit',
@@ -228,10 +239,10 @@ const generateAndDownload = () => {
    const row = [
      className,
      formattedDate,
-     formatTime(startTime),
+     isAllDay ? '' : formatTime(startTime),
      formattedDate,
-     formatTime(endTime),
-     'FALSE',
+     isAllDay ? '' : formatTime(endTime),
+     isAllDay ? 'TRUE' : 'FALSE',
      description,
      '',
      'FALSE'
@@ -254,7 +265,7 @@ const generateAndDownload = () => {
    console.error('Download error:', error);
  }
 };
-
+ 
 return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto p-4 space-y-8">
