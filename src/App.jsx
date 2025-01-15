@@ -161,6 +161,16 @@ const generateAndDownload = () => {
  dateAssignments.forEach(assignment => {
    const daySchedule = timetable[assignment.dayNumber];
    if (daySchedule) {
+     // Add full-day event for the day number
+     addSessionToCSV({
+       className: `Day ${assignment.dayNumber}`,
+       date: assignment.date,
+       startTime: '00:00',
+       endTime: '23:59',
+       description: `Day ${assignment.dayNumber}`,
+       isAllDay: true
+     });
+
      const schedule = getScheduleForDate(assignment.date);
      
      // Add Monday PD session
@@ -230,7 +240,7 @@ const generateAndDownload = () => {
    }
  });
 
- function addSessionToCSV({ className, date, startTime, endTime, description }) {
+ function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay = false }) {
    const formattedDate = new Date(date).toLocaleDateString('en-US', {
      month: '2-digit',
      day: '2-digit',
@@ -250,10 +260,10 @@ const generateAndDownload = () => {
    const row = [
      className,
      formattedDate,
-     formatTime(startTime),
+     isAllDay ? '' : formatTime(startTime),
      formattedDate,
-     formatTime(endTime),
-     'FALSE',
+     isAllDay ? '' : formatTime(endTime),
+     isAllDay ? 'TRUE' : 'FALSE',
      description,
      '',
      'FALSE'
