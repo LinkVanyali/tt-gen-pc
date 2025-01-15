@@ -7,13 +7,13 @@ const MONDAY_SCHEDULE = [
  { id: 1, name: 'Lesson 1', startTime: '08:35', endTime: '09:10', duration: '35 min' },
  { id: 2, name: 'Lesson 2', startTime: '09:15', endTime: '09:50', duration: '35 min' },
  { id: 3, name: 'Lesson 3', startTime: '09:55', endTime: '10:30', duration: '35 min' },
- { id: 'meetings', name: 'Meetings', startTime: '10:30', endTime: '10:55', duration: '25 min' },
+ { id: 'utility', name: 'Meeting/Utility', startTime: '10:30', endTime: '10:55', duration: '25 min' },
  { id: 'break1', name: 'Break', startTime: '10:55', endTime: '11:15', duration: '20 min' },
  { id: 4, name: 'Lesson 4', startTime: '11:15', endTime: '11:55', duration: '35 min' },
  { id: 5, name: 'Lesson 5', startTime: '12:00', endTime: '12:35', duration: '35 min' },
  { id: 'break2', name: 'Break', startTime: '12:40', endTime: '13:10', duration: '30 min' },
  { id: 6, name: 'Lesson 6', startTime: '13:10', endTime: '13:50', duration: '40 min' },
- { id: 7, name: 'Lesson 7', startTime: '13:55', endTime: '14:35', duration: '40 min' },
+ { id: 7, name: 'Lesson 7', startTime: '13:55', endTime: '14:35', duration: '40 min' }
 ];
 
 const REGULAR_SCHEDULE = [
@@ -189,8 +189,8 @@ const generateAndDownload = () => {
           className = daySchedule[period.id] || 'Break';
           description = 'Break Time';
         } else if (period.id === 'utility') {
-          className = daySchedule[period.id] || 'Utility';
-          description = 'Utility Period';
+          className = daySchedule[period.id] || 'Meeting/Utility';
+          description = 'Meeting/Utility Period';
         } else if (assignment.dayOfWeek === 1) {
           if (period.id === 'homeroom') {
             className = 'PD';
