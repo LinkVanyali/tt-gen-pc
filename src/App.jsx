@@ -53,17 +53,15 @@ const getScheduleForDate = (date) => {
 
 function App() {
   const [timetable, setTimetable] = useState(() => {
-    const days = {};
-    for (let day = 1; day <= 7; day++) {
-      days[day] = {};
-      REGULAR_SCHEDULE.forEach(period => {
-        if (typeof period.id === 'number') {
-          days[day][period.id] = 'Test Class ' + period.id;
-        }
-      });
-    }
-    return days;
-  });
+  const days = {};
+  for (let day = 1; day <= 7; day++) {
+    days[day] = {};
+    REGULAR_SCHEDULE.forEach(period => {
+      days[day][period.id] = '';
+    });
+  }
+  return days;
+});
 
   const [dateRange, setDateRange] = useState({
     startDate: '',
@@ -132,12 +130,23 @@ function App() {
     }
   };
 
-  const updateDayNumber = (index, dayNumber) => {
-    setDateAssignments(prev => prev.map((assignment, i) => 
-      i === index ? { ...assignment, dayNumber } : assignment
-    ));
-  };
-
+const updateDayNumber = (index, dayNumber) => {
+ const confirmed = window.confirm(`This will update day numbers for all subsequent dates in sequence. Continue?`);
+ 
+ if (confirmed) {
+   setDateAssignments(prev => {
+     const newAssignments = [...prev];
+     newAssignments[index] = { ...newAssignments[index], dayNumber };
+     
+     for (let i = index + 1; i < newAssignments.length; i++) {
+       const nextDayNumber = newAssignments[i-1].dayNumber === 7 ? 1 : newAssignments[i-1].dayNumber + 1;
+       newAssignments[i] = { ...newAssignments[i], dayNumber: nextDayNumber };
+     }
+     return newAssignments;
+   });
+ }
+};
+  
 const generateICalEvent = (className, date, period) => {
   const eventDate = date.replace(/-/g, '');
   const startDateTime = `${eventDate}T${period.startTime.replace(':', '')}00`;
@@ -150,31 +159,34 @@ const generateAndDownload = () => {
   let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
   
   dateAssignments.forEach(assignment => {
+    // Add all-day event for the day number
+    const formattedDate = new Date(assignment.date).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+    
+    const dayEvent = [
+      `DAY ${assignment.dayNumber}`,
+      formattedDate,
+      '',
+      formattedDate,
+      '',
+      'TRUE',
+      '',
+      '',
+      'FALSE'
+    ].map(field => `"${field}"`).join(',');
+    
+    csvContent += dayEvent + '\n';
+
+    // Rest of the existing code for regular events
     const daySchedule = timetable[assignment.dayNumber];
     if (daySchedule) {
       const schedule = getScheduleForDate(assignment.date);
       schedule.forEach(period => {
-        let className;
-        if (assignment.dayOfWeek === 1 && period.id === 'homeroom') {
-          className = 'Homerooms/PD';
-        } else if (assignment.dayOfWeek === 1 && period.id === 'lines') {
-          className = 'Lines';
-        } else if (assignment.dayOfWeek === 5 && period.id === 'assembly') {
-          className = 'Assembly';
-        } else {
-          className = typeof period.id === 'number' ? daySchedule[period.id] : '';
-        }
-        if ((className && typeof period.id === 'number') || 
-            (assignment.dayOfWeek === 1 && (period.id === 'homeroom' || period.id === 'lines')) ||
-            (assignment.dayOfWeek === 5 && period.id === 'assembly')) {
-          // Format date as MM/DD/YYYY
-          const formattedDate = new Date(assignment.date).toLocaleDateString('en-US', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric'
-          });
-          
-          // Convert 24h time to 12h time with AM/PM
+        const className = daySchedule[period.id] || '';
+        if (className) {
           const formatTime = (time24h) => {
             const [hours, minutes] = time24h.split(':');
             const date = new Date(2000, 0, 1, hours, minutes);
@@ -186,15 +198,15 @@ const generateAndDownload = () => {
           };
 
           const row = [
-            className,                     // Subject
-            formattedDate,                // Start Date
-            formatTime(period.startTime),  // Start Time
-            formattedDate,                // End Date
-            formatTime(period.endTime),    // End Time
-            'FALSE',                      // All Day Event
-            `Period ${period.id}`,        // Description
-            '',                           // Location
-            'FALSE'                       // Private
+            className,
+            formattedDate,
+            formatTime(period.startTime),
+            formattedDate,
+            formatTime(period.endTime),
+            'FALSE',
+            period.name,
+            '',
+            'FALSE'
           ].map(field => `"${field}"`).join(',');
 
           csvContent += row + '\n';
@@ -203,8 +215,9 @@ const generateAndDownload = () => {
     }
   });
 
+  console.log('Generated CSV content:', csvContent);
+  
   try {
-    console.log('Generated CSV content:', csvContent);
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -247,21 +260,18 @@ return (
                       {period.startTime} - {period.endTime}
                     </td>
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
-                      <td key={`${day}-${period.id}`} className="border border-gray-200 p-1">
-                        <input
-                          type="text"
-                          value={typeof period.id === 'number' ? (timetable[day][period.id] || '') : ''}
-                          onChange={(e) => {
-                            if (typeof period.id === 'number') {
-                              const newTimetable = { ...timetable };
-                              newTimetable[day][period.id] = e.target.value;
-                              setTimetable(newTimetable);
-                            }
-                          }}
-                          className="w-full p-1 border rounded"
-                          disabled={typeof period.id !== 'number'}
-                        />
-                      </td>
+                    <td key={`${day}-${period.id}`} className="border border-gray-200 p-1">
+                      <input
+                        type="text"
+                        value={timetable[day][period.id] || ''}
+                        onChange={(e) => {
+                          const newTimetable = { ...timetable };
+                          newTimetable[day][period.id] = e.target.value;
+                          setTimetable(newTimetable);
+                        }}
+                        className="w-full p-1 border rounded"
+                      />
+                    </td>
                     ))}
                   </tr>
                 ))}
