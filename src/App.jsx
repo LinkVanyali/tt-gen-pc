@@ -171,49 +171,45 @@ const generateAndDownload = () => {
    if (daySchedule) {
      const schedule = getScheduleForDate(assignment.date);
      
-     // Add Monday PD session
-     if (assignment.dayOfWeek === 1) {
-       addSessionToCSV({
-         className: 'PD',
-         date: assignment.date,
-         startTime: '07:50',
-         endTime: '08:30', 
-         description: 'Professional Development'
-       });
-     }
-     
-     // Add Monday Meetings
-     if (assignment.dayOfWeek === 1) {
-       addSessionToCSV({
-         className: 'Meetings',
-         date: assignment.date,
-         startTime: '10:30',
-         endTime: '10:55',
-         description: 'Staff Meetings'
-       });
-     }
-     
-     // Add Friday Assembly
-     if (assignment.dayOfWeek === 5) {
-       addSessionToCSV({
-         className: 'Assembly',
-         date: assignment.date,
-         startTime: '13:20',
-         endTime: '14:35',
-         description: 'School Assembly'
-       });
-     }
-
-     // Regular class periods
+     // Add standard periods
      schedule.forEach(period => {
-       const className = typeof period.id === 'number' ? daySchedule[period.id] : '';
-       if (className && typeof period.id === 'number') {
+       let className = '';
+       let description = '';
+
+       // Handle different period types
+       if (typeof period.id === 'number') {
+         className = daySchedule[period.id];
+         description = `Session ${period.id}`;
+       } else if (period.id === 'break1' || period.id === 'break2') {
+         className = 'Break';
+         description = 'Break Time';
+       } else if (period.id === 'utility') {
+         className = 'Utility';
+         description = 'Utility Session';
+       } else if (assignment.dayOfWeek === 1) {
+         if (period.id === 'homeroom') {
+           className = 'PD';
+           description = 'Professional Development';
+         } else if (period.id === 'lines') {
+           className = 'Lines';
+           description = 'School Lines';
+         } else if (period.id === 'meetings') {
+           className = 'Meetings';
+           description = 'Staff Meetings';
+         }
+       } else if (assignment.dayOfWeek === 5 && period.id === 'assembly') {
+         className = 'Assembly';
+         description = 'School Assembly';
+       }
+
+       // Add to CSV if it's a valid session
+       if (className) {
          addSessionToCSV({
            className,
            date: assignment.date,
            startTime: period.startTime,
            endTime: period.endTime,
-           description: `Period ${period.id}`
+           description
          });
        }
      });
