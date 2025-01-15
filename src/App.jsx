@@ -131,20 +131,25 @@ function App() {
   };
 
 const updateDayNumber = (index, dayNumber) => {
- const confirmed = window.confirm(`This will update day numbers for all subsequent dates in sequence. Continue?`);
- 
- if (confirmed) {
-   setDateAssignments(prev => {
-     const newAssignments = [...prev];
-     newAssignments[index] = { ...newAssignments[index], dayNumber };
-     
-     for (let i = index + 1; i < newAssignments.length; i++) {
-       const nextDayNumber = newAssignments[i-1].dayNumber === 7 ? 1 : newAssignments[i-1].dayNumber + 1;
-       newAssignments[i] = { ...newAssignments[i], dayNumber: nextDayNumber };
-     }
-     return newAssignments;
-   });
- }
+  const confirmed = dayNumber === 0 || window.confirm(
+    `This will update day numbers for all subsequent dates in sequence. Continue?`
+  );
+  
+  if (confirmed) {
+    setDateAssignments(prev => {
+      const newAssignments = [...prev];
+      newAssignments[index] = { ...newAssignments[index], dayNumber };
+      
+      // Only update subsequent days if not setting to "no schedule"
+      if (dayNumber !== 0) {
+        for (let i = index + 1; i < newAssignments.length; i++) {
+          const nextDayNumber = newAssignments[i-1].dayNumber === 7 ? 1 : newAssignments[i-1].dayNumber + 1;
+          newAssignments[i] = { ...newAssignments[i], dayNumber: nextDayNumber };
+        }
+      }
+      return newAssignments;
+    });
+  }
 };
   
 const generateICalEvent = (className, date, Lesson) => {
@@ -159,18 +164,11 @@ const generateAndDownload = () => {
  let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
  
  dateAssignments.forEach(assignment => {
+   // Skip if no schedule is assigned
+   if (assignment.dayNumber === 0) return;
+   
    const daySchedule = timetable[assignment.dayNumber];
    if (daySchedule) {
-     // Add full-day event for the day number
-     addSessionToCSV({
-       className: `Day ${assignment.dayNumber}`,
-       date: assignment.date,
-       startTime: '00:00',
-       endTime: '23:59',
-       description: `Day ${assignment.dayNumber}`,
-       isAllDay: true
-     });
-
      const schedule = getScheduleForDate(assignment.date);
      
      // Add Monday PD session
@@ -179,7 +177,7 @@ const generateAndDownload = () => {
          className: 'PD',
          date: assignment.date,
          startTime: '07:50',
-         endTime: '08:30',
+         endTime: '08:30', 
          description: 'Professional Development'
        });
      }
@@ -206,41 +204,23 @@ const generateAndDownload = () => {
        });
      }
 
-     // Add regular lessons and other periods
+     // Regular class periods
      schedule.forEach(period => {
-       if (typeof period.id === 'number') {
-         const className = daySchedule[period.id];
-         if (className) {
-           addSessionToCSV({
-             className,
-             date: assignment.date,
-             startTime: period.startTime,
-             endTime: period.endTime,
-             description: `Period ${period.id}`
-           });
-         }
-       } else if (period.id === 'break1' || period.id === 'break2') {
+       const className = typeof period.id === 'number' ? daySchedule[period.id] : '';
+       if (className && typeof period.id === 'number') {
          addSessionToCSV({
-           className: 'Break',
+           className,
            date: assignment.date,
            startTime: period.startTime,
            endTime: period.endTime,
-           description: period.name
-         });
-       } else if (period.id === 'utility') {
-         addSessionToCSV({
-           className: 'Utility',
-           date: assignment.date,
-           startTime: period.startTime,
-           endTime: period.endTime,
-           description: 'Utility Period'
+           description: `Period ${period.id}`
          });
        }
      });
    }
  });
 
- function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay = false }) {
+ function addSessionToCSV({ className, date, startTime, endTime, description }) {
    const formattedDate = new Date(date).toLocaleDateString('en-US', {
      month: '2-digit',
      day: '2-digit',
@@ -260,10 +240,10 @@ const generateAndDownload = () => {
    const row = [
      className,
      formattedDate,
-     isAllDay ? '' : formatTime(startTime),
+     formatTime(startTime),
      formattedDate,
-     isAllDay ? '' : formatTime(endTime),
-     isAllDay ? 'TRUE' : 'FALSE',
+     formatTime(endTime),
+     'FALSE',
      description,
      '',
      'FALSE'
@@ -403,6 +383,7 @@ return (
                               onChange={(e) => updateDayNumber(index, parseInt(e.target.value))}
                               className="w-full p-1 border rounded"
                             >
+                              <option value={0}>No Schedule</option>
                               {[1, 2, 3, 4, 5, 6, 7].map(day => (
                                 <option key={day} value={day}>Day {day}</option>
                               ))}
