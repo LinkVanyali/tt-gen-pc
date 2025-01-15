@@ -5,41 +5,41 @@ import { Download } from 'lucide-react';
 const MONDAY_SCHEDULE = [
   { id: 'homeroom', name: 'Homerooms', startTime: '07:50', endTime: '08:15', duration: '25 min' },
   { id: 'lines', name: 'Lines', startTime: '08:15', endTime: '08:30', duration: '15 min' },
-  { id: 1, name: 'Period 1', startTime: '08:35', endTime: '09:10', duration: '35 min' },
-  { id: 2, name: 'Period 2', startTime: '09:15', endTime: '09:50', duration: '35 min' },
-  { id: 3, name: 'Period 3', startTime: '09:55', endTime: '10:30', duration: '35 min' },
+  { id: 1, name: 'Lesson 1', startTime: '08:35', endTime: '09:10', duration: '35 min' },
+  { id: 2, name: 'Lesson 2', startTime: '09:15', endTime: '09:50', duration: '35 min' },
+  { id: 3, name: 'Lesson 3', startTime: '09:55', endTime: '10:30', duration: '35 min' },
   { id: 'meetings', name: 'Meetings', startTime: '10:30', endTime: '10:55', duration: '25 min' },
   { id: 'break1', name: 'Break', startTime: '10:55', endTime: '11:15', duration: '20 min' },
-  { id: 4, name: 'Period 4', startTime: '11:15', endTime: '11:55', duration: '35 min' },
-  { id: 5, name: 'Period 5', startTime: '12:00', endTime: '12:35', duration: '35 min' },
+  { id: 4, name: 'Lesson 4', startTime: '11:15', endTime: '11:55', duration: '35 min' },
+  { id: 5, name: 'Lesson 5', startTime: '12:00', endTime: '12:35', duration: '35 min' },
   { id: 'break2', name: 'Break', startTime: '12:40', endTime: '13:10', duration: '30 min' },
-  { id: 6, name: 'Period 6', startTime: '13:10', endTime: '13:50', duration: '40 min' },
-  { id: 7, name: 'Period 7', startTime: '13:55', endTime: '14:35', duration: '40 min' },
+  { id: 6, name: 'Lesson 6', startTime: '13:10', endTime: '13:50', duration: '40 min' },
+  { id: 7, name: 'Lesson 7', startTime: '13:55', endTime: '14:35', duration: '40 min' },
 ];
 
 const REGULAR_SCHEDULE = [
-  { id: 1, name: 'Period 1', startTime: '07:50', endTime: '08:35', duration: '45 min' },
-  { id: 2, name: 'Period 2', startTime: '08:40', endTime: '09:25', duration: '45 min' },
-  { id: 3, name: 'Period 3', startTime: '09:30', endTime: '10:15', duration: '45 min' },
+  { id: 1, name: 'Lesson 1', startTime: '07:50', endTime: '08:35', duration: '45 min' },
+  { id: 2, name: 'Lesson 2', startTime: '08:40', endTime: '09:25', duration: '45 min' },
+  { id: 3, name: 'Lesson 3', startTime: '09:30', endTime: '10:15', duration: '45 min' },
   { id: 'utility', name: 'Utility', startTime: '10:15', endTime: '10:45', duration: '30 min' },
   { id: 'break1', name: 'Break', startTime: '10:45', endTime: '11:05', duration: '20 min' },
-  { id: 4, name: 'Period 4', startTime: '11:05', endTime: '11:50', duration: '45 min' },
-  { id: 5, name: 'Period 5', startTime: '11:55', endTime: '12:35', duration: '40 min' },
+  { id: 4, name: 'Lesson 4', startTime: '11:05', endTime: '11:50', duration: '45 min' },
+  { id: 5, name: 'Lesson 5', startTime: '11:55', endTime: '12:35', duration: '40 min' },
   { id: 'break2', name: 'Break', startTime: '12:35', endTime: '13:05', duration: '30 min' },
-  { id: 6, name: 'Period 6', startTime: '13:05', endTime: '13:45', duration: '40 min' },
-  { id: 7, name: 'Period 7', startTime: '13:50', endTime: '14:35', duration: '45 min' },
+  { id: 6, name: 'Lesson 6', startTime: '13:05', endTime: '13:45', duration: '40 min' },
+  { id: 7, name: 'Lesson 7', startTime: '13:50', endTime: '14:35', duration: '45 min' },
 ];
 
 const FRIDAY_SCHEDULE = [
-  { id: 1, name: 'Period 1', startTime: '07:50', endTime: '08:25', duration: '35 min' },
-  { id: 2, name: 'Period 2', startTime: '08:30', endTime: '09:05', duration: '35 min' },
-  { id: 3, name: 'Period 3', startTime: '09:10', endTime: '09:45', duration: '35 min' },
+  { id: 1, name: 'Lesson 1', startTime: '07:50', endTime: '08:25', duration: '35 min' },
+  { id: 2, name: 'Lesson 2', startTime: '08:30', endTime: '09:05', duration: '35 min' },
+  { id: 3, name: 'Lesson 3', startTime: '09:10', endTime: '09:45', duration: '35 min' },
   { id: 'break1', name: 'Break', startTime: '09:45', endTime: '10:15', duration: '30 min' },
-  { id: 4, name: 'Period 4', startTime: '10:15', endTime: '10:55', duration: '35 min' },
-  { id: 5, name: 'Period 5', startTime: '11:00', endTime: '11:35', duration: '35 min' },
+  { id: 4, name: 'Lesson 4', startTime: '10:15', endTime: '10:55', duration: '35 min' },
+  { id: 5, name: 'Lesson 5', startTime: '11:00', endTime: '11:35', duration: '35 min' },
   { id: 'break2', name: 'Break', startTime: '11:35', endTime: '12:05', duration: '30 min' },
-  { id: 6, name: 'Period 6', startTime: '12:05', endTime: '12:40', duration: '35 min' },
-  { id: 7, name: 'Period 7', startTime: '12:45', endTime: '13:20', duration: '35 min' },
+  { id: 6, name: 'Lesson 6', startTime: '12:05', endTime: '12:40', duration: '35 min' },
+  { id: 7, name: 'Lesson 7', startTime: '12:45', endTime: '13:20', duration: '35 min' },
   { id: 'assembly', name: 'Assembly', startTime: '13:20', endTime: '14:35', duration: '75 min' },
 ];
 
@@ -56,8 +56,8 @@ function App() {
   const days = {};
   for (let day = 1; day <= 7; day++) {
     days[day] = {};
-    REGULAR_SCHEDULE.forEach(period => {
-      days[day][period.id] = '';
+    REGULAR_SCHEDULE.forEach(Lesson => {
+      days[day][Lesson.id] = '';
     });
   }
   return days;
@@ -147,12 +147,12 @@ const updateDayNumber = (index, dayNumber) => {
  }
 };
   
-const generateICalEvent = (className, date, period) => {
+const generateICalEvent = (className, date, Lesson) => {
   const eventDate = date.replace(/-/g, '');
-  const startDateTime = `${eventDate}T${period.startTime.replace(':', '')}00`;
-  const endDateTime = `${eventDate}T${period.endTime.replace(':', '')}00`;
+  const startDateTime = `${eventDate}T${Lesson.startTime.replace(':', '')}00`;
+  const endDateTime = `${eventDate}T${Lesson.endTime.replace(':', '')}00`;
   
-  return `BEGIN:VEVENT\r\nUID: ${date}-${period.id}@schooltimetable\r\nDTSTAMP: ${new Date().toISOString().replace(/[-:.]/g, '').slice(0,15)}Z\r\nDTSTART: ${startDateTime}\r\nDTEND: ${endDateTime}\r\nSUMMARY: ${className}\r\nDESCRIPTION: Period ${period.id}\r\nEND:VEVENT`;
+  return `BEGIN:VEVENT\r\nUID: ${date}-${Lesson.id}@schooltimetable\r\nDTSTAMP: ${new Date().toISOString().replace(/[-:.]/g, '').slice(0,15)}Z\r\nDTSTART: ${startDateTime}\r\nDTEND: ${endDateTime}\r\nSUMMARY: ${className}\r\nDESCRIPTION: Lesson ${Lesson.id}\r\nEND:VEVENT`;
 };
 
 const generateAndDownload = () => {
@@ -184,8 +184,8 @@ const generateAndDownload = () => {
     const daySchedule = timetable[assignment.dayNumber];
     if (daySchedule) {
       const schedule = getScheduleForDate(assignment.date);
-      schedule.forEach(period => {
-        const className = daySchedule[period.id] || '';
+      schedule.forEach(Lesson => {
+        const className = daySchedule[Lesson.id] || '';
         if (className) {
           const formatTime = (time24h) => {
             const [hours, minutes] = time24h.split(':');
@@ -200,11 +200,11 @@ const generateAndDownload = () => {
           const row = [
             className,
             formattedDate,
-            formatTime(period.startTime),
+            formatTime(Lesson.startTime),
             formattedDate,
-            formatTime(period.endTime),
+            formatTime(Lesson.endTime),
             'FALSE',
-            period.name,
+            Lesson.name,
             '',
             'FALSE'
           ].map(field => `"${field}"`).join(',');
@@ -243,7 +243,7 @@ return (
             <table className="min-w-full border-collapse border border-gray-200">
               <thead>
                 <tr>
-                  <th className="border border-gray-200 p-2">Period</th>
+                  <th className="border border-gray-200 p-2">Lesson</th>
                   <th className="border border-gray-200 p-2">Time</th>
                   {[1, 2, 3, 4, 5, 6, 7].map(day => (
                     <th key={day} className="border border-gray-200 p-2">
@@ -253,20 +253,20 @@ return (
                 </tr>
               </thead>
               <tbody>
-                {REGULAR_SCHEDULE.map(period => (
-                  <tr key={period.id} className={typeof period.id === 'string' ? 'bg-gray-50' : ''}>
-                    <td className="border border-gray-200 p-2 font-medium">{period.name}</td>
+                {REGULAR_SCHEDULE.map(Lesson => (
+                  <tr key={Lesson.id} className={typeof Lesson.id === 'string' ? 'bg-gray-50' : ''}>
+                    <td className="border border-gray-200 p-2 font-medium">{Lesson.name}</td>
                     <td className="border border-gray-200 p-2 text-sm">
-                      {period.startTime} - {period.endTime}
+                      {Lesson.startTime} - {Lesson.endTime}
                     </td>
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
-                    <td key={`${day}-${period.id}`} className="border border-gray-200 p-1">
+                    <td key={`${day}-${Lesson.id}`} className="border border-gray-200 p-1">
                       <input
                         type="text"
-                        value={timetable[day][period.id] || ''}
+                        value={timetable[day][Lesson.id] || ''}
                         onChange={(e) => {
                           const newTimetable = { ...timetable };
-                          newTimetable[day][period.id] = e.target.value;
+                          newTimetable[day][Lesson.id] = e.target.value;
                           setTimetable(newTimetable);
                         }}
                         className="w-full p-1 border rounded"
