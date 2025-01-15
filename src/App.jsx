@@ -151,14 +151,6 @@ const updateDayNumber = (index, dayNumber) => {
   }
 };
   
-const generateICalEvent = (className, date, Lesson) => {
-  const eventDate = date.replace(/-/g, '');
-  const startDateTime = `${eventDate}T${Lesson.startTime.replace(':', '')}00`;
-  const endDateTime = `${eventDate}T${Lesson.endTime.replace(':', '')}00`;
-  
-  return `BEGIN:VEVENT\r\nUID: ${date}-${Lesson.id}@schooltimetable\r\nDTSTAMP: ${new Date().toISOString().replace(/[-:.]/g, '').slice(0,15)}Z\r\nDTSTART: ${startDateTime}\r\nDTEND: ${endDateTime}\r\nSUMMARY: ${className}\r\nDESCRIPTION: Lesson ${Lesson.id}\r\nEND:VEVENT`;
-};
-
 const generateAndDownload = () => {
   let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
   
@@ -184,13 +176,13 @@ const generateAndDownload = () => {
 
         if (typeof period.id === 'number') {
           className = daySchedule[period.id];
-          description = `Period ${period.id}`;
+          description = `Session ${period.id}`;
         } else if (period.id === 'break1' || period.id === 'break2') {
           className = daySchedule[period.id] || 'Break';
           description = 'Break Time';
         } else if (period.id === 'utility') {
           className = daySchedule[period.id] || 'Meeting/Utility';
-          description = 'Meeting/Utility Period';
+          description = 'Meeting/Utility Session';
         } else if (assignment.dayOfWeek === 1) {
           if (period.id === 'homeroom') {
             className = 'PD';
