@@ -50,8 +50,7 @@ const getScheduleForDate = (date) => {
   return REGULAR_SCHEDULE;
 };
 
-function App() {
-  const [timetable, setTimetable] = useState(() => {
+const initializeTimetable = () => {
   const days = {};
   for (let day = 1; day <= 7; day++) {
     days[day] = {};
@@ -60,7 +59,16 @@ function App() {
     });
   }
   return days;
-});
+};
+
+function App() {
+  const [timetable, setTimetable] = useState(() => {
+    const saved = localStorage.getItem('timetableTemplates');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return initializeTimetable();
+  });
 
   const [dateRange, setDateRange] = useState({
     startDate: '',
@@ -68,6 +76,10 @@ function App() {
   });
 
   const [dateAssignments, setDateAssignments] = useState([]);
+
+  useEffect(() => {
+    localStorage.setItem('timetableTemplates', JSON.stringify(timetable));
+  }, [timetable]);
 
   const isWeekday = (date) => {
     const day = date.getDay();
