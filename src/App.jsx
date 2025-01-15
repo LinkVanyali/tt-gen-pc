@@ -156,108 +156,79 @@ const generateICalEvent = (className, date, Lesson) => {
 };
 
 const generateAndDownload = () => {
-  let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
-  
-  dateAssignments.forEach(assignment => {
-    const daySchedule = timetable[assignment.dayNumber];
-    if (daySchedule) {
-      const schedule = getScheduleForDate(assignment.date);
-      
-      // Add Monday PD session
-      if (assignment.dayOfWeek === 1) {
-        addSessionToCSV({
-          className: 'PD',
-          date: assignment.date,
-          startTime: '07:50',
-          endTime: '08:30',
-          description: 'Professional Development'
-        });
-      }
-      
-      // Add Monday Meetings
-      if (assignment.dayOfWeek === 1) {
-        addSessionToCSV({
-          className: 'Meetings',
-          date: assignment.date,
-          startTime: '10:30',
-          endTime: '10:55',
-          description: 'Staff Meetings'
-        });
-      }
-      
-      // Add Friday Assembly
-      if (assignment.dayOfWeek === 5) {
-        addSessionToCSV({
-          className: 'Assembly',
-          date: assignment.date,
-          startTime: '13:20',
-          endTime: '14:35',
-          description: 'School Assembly'
-        });
-      }
+ let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
+ 
+ dateAssignments.forEach(assignment => {
+   const daySchedule = timetable[assignment.dayNumber];
+   if (daySchedule) {
+     const schedule = getScheduleForDate(assignment.date);
+     
+     // Add Monday PD session
+     if (assignment.dayOfWeek === 1) {
+       addSessionToCSV({
+         className: 'PD',
+         date: assignment.date,
+         startTime: '07:50',
+         endTime: '08:30',
+         description: 'Professional Development'
+       });
+     }
+     
+     // Add Monday Meetings
+     if (assignment.dayOfWeek === 1) {
+       addSessionToCSV({
+         className: 'Meetings',
+         date: assignment.date,
+         startTime: '10:30',
+         endTime: '10:55',
+         description: 'Staff Meetings'
+       });
+     }
+     
+     // Add Friday Assembly
+     if (assignment.dayOfWeek === 5) {
+       addSessionToCSV({
+         className: 'Assembly',
+         date: assignment.date,
+         startTime: '13:20',
+         endTime: '14:35',
+         description: 'School Assembly'
+       });
+     }
 
-      // Regular class periods
-      schedule.forEach(period => {
-        const className = typeof period.id === 'number' ? daySchedule[period.id] : '';
-        if (className && typeof period.id === 'number') {
-          addSessionToCSV({
-            className,
-            date: assignment.date,
-            startTime: period.startTime,
-            endTime: period.endTime,
-            description: `Period ${period.id}`
-          });
-        }
-      });
-    }
-  });
-
-  function addSessionToCSV({ className, date, startTime, endTime, description }) {
-    const formattedDate = new Date(date).toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric'
-    });
-    
-    const formatTime = (time24h) => {
-      const [hours, minutes] = time24h.split(':');
-      const date = new Date(2000, 0, 1, hours, minutes);
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-    };
-
-    const row = [
-      className,
-      formattedDate,
-      formatTime(startTime),
-      formattedDate,
-      formatTime(endTime),
-      'FALSE',
-      description,
-      '',
-      'FALSE'
-    ].map(field => `"${field}"`).join(',');
-
-    csvContent += row + '\n';
-  }
-
-  try {
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'school-timetable.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error('Download error:', error);
-  }
-};
+     // Add regular lessons and other periods
+     schedule.forEach(period => {
+       if (typeof period.id === 'number') {
+         const className = daySchedule[period.id];
+         if (className) {
+           addSessionToCSV({
+             className,
+             date: assignment.date,
+             startTime: period.startTime,
+             endTime: period.endTime,
+             description: `Period ${period.id}`
+           });
+         }
+       } else if (period.id === 'break1' || period.id === 'break2') {
+         addSessionToCSV({
+           className: 'Break',
+           date: assignment.date,
+           startTime: period.startTime,
+           endTime: period.endTime,
+           description: period.name
+         });
+       } else if (period.id === 'utility') {
+         addSessionToCSV({
+           className: 'Utility',
+           date: assignment.date,
+           startTime: period.startTime,
+           endTime: period.endTime,
+           description: 'Utility Period'
+         });
+       }
+     });
+   }
+ });
 
 return (
     <div className="min-h-screen bg-gray-100 py-8">
