@@ -50,8 +50,23 @@ const getScheduleForDate = (date) => {
   return REGULAR_SCHEDULE;
 };
 
+const initializeTimetable = () => {
+  const days = {};
+  for (let day = 1; day <= 7; day++) {
+    days[day] = {};
+    REGULAR_SCHEDULE.forEach(Lesson => {
+      days[day][Lesson.id] = '';
+    });
+  }
+  return days;
+};
+
 function App() {
   const [timetable, setTimetable] = useState(() => {
+  const saved = localStorage.getItem('timetableTemplates');
+  if (saved) {
+    return JSON.parse(saved);
+  }
   const days = {};
   for (let day = 1; day <= 7; day++) {
     days[day] = {};
@@ -68,6 +83,10 @@ function App() {
   });
 
   const [dateAssignments, setDateAssignments] = useState([]);
+
+ useEffect(() => {
+  localStorage.setItem('timetableTemplates', JSON.stringify(timetable));
+ }, [timetable]);
 
   const isWeekday = (date) => {
     const day = date.getDay();
