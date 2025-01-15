@@ -159,64 +159,91 @@ const generateAndDownload = () => {
   let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
   
   dateAssignments.forEach(assignment => {
-    // Add all-day event for the day number
-    const formattedDate = new Date(assignment.date).toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric'
-    });
-    
-    const dayEvent = [
-      `DAY ${assignment.dayNumber}`,
-      formattedDate,
-      '',
-      formattedDate,
-      '',
-      'TRUE',
-      '',
-      '',
-      'FALSE'
-    ].map(field => `"${field}"`).join(',');
-    
-    csvContent += dayEvent + '\n';
-
-    // Rest of the existing code for regular events
     const daySchedule = timetable[assignment.dayNumber];
     if (daySchedule) {
       const schedule = getScheduleForDate(assignment.date);
-      schedule.forEach(Lesson => {
-        const className = daySchedule[Lesson.id] || '';
-        if (className) {
-          const formatTime = (time24h) => {
-            const [hours, minutes] = time24h.split(':');
-            const date = new Date(2000, 0, 1, hours, minutes);
-            return date.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            });
-          };
+      
+      // Add Monday PD session
+      if (assignment.dayOfWeek === 1) {
+        addSessionToCSV({
+          className: 'PD',
+          date: assignment.date,
+          startTime: '07:50',
+          endTime: '08:30',
+          description: 'Professional Development'
+        });
+      }
+      
+      // Add Monday Meetings
+      if (assignment.dayOfWeek === 1) {
+        addSessionToCSV({
+          className: 'Meetings',
+          date: assignment.date,
+          startTime: '10:30',
+          endTime: '10:55',
+          description: 'Staff Meetings'
+        });
+      }
+      
+      // Add Friday Assembly
+      if (assignment.dayOfWeek === 5) {
+        addSessionToCSV({
+          className: 'Assembly',
+          date: assignment.date,
+          startTime: '13:20',
+          endTime: '14:35',
+          description: 'School Assembly'
+        });
+      }
 
-          const row = [
+      // Regular class periods
+      schedule.forEach(period => {
+        const className = typeof period.id === 'number' ? daySchedule[period.id] : '';
+        if (className && typeof period.id === 'number') {
+          addSessionToCSV({
             className,
-            formattedDate,
-            formatTime(Lesson.startTime),
-            formattedDate,
-            formatTime(Lesson.endTime),
-            'FALSE',
-            Lesson.name,
-            '',
-            'FALSE'
-          ].map(field => `"${field}"`).join(',');
-
-          csvContent += row + '\n';
+            date: assignment.date,
+            startTime: period.startTime,
+            endTime: period.endTime,
+            description: `Period ${period.id}`
+          });
         }
       });
     }
   });
 
-  console.log('Generated CSV content:', csvContent);
-  
+  function addSessionToCSV({ className, date, startTime, endTime, description }) {
+    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+    
+    const formatTime = (time24h) => {
+      const [hours, minutes] = time24h.split(':');
+      const date = new Date(2000, 0, 1, hours, minutes);
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    };
+
+    const row = [
+      className,
+      formattedDate,
+      formatTime(startTime),
+      formattedDate,
+      formatTime(endTime),
+      'FALSE',
+      description,
+      '',
+      'FALSE'
+    ].map(field => `"${field}"`).join(',');
+
+    csvContent += row + '\n';
+  }
+
   try {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
