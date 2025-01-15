@@ -160,110 +160,109 @@ const generateICalEvent = (className, date, Lesson) => {
 };
 
 const generateAndDownload = () => {
- let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
- 
- dateAssignments.forEach(assignment => {
-   if (assignment.dayNumber === 0) return;
-   
-   const daySchedule = timetable[assignment.dayNumber];
-   if (daySchedule) {
-     // Add all-day Day Number event
-     addSessionToCSV({
-       className: `Day ${assignment.dayNumber}`,
-       date: assignment.date,
-       startTime: '00:00',
-       endTime: '23:59',
-       description: `Day ${assignment.dayNumber}`,
-       isAllDay: true
-     });
+  let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
+  
+  dateAssignments.forEach(assignment => {
+    if (assignment.dayNumber === 0) return;
+    
+    const daySchedule = timetable[assignment.dayNumber];
+    if (daySchedule) {
+      addSessionToCSV({
+        className: `Day ${assignment.dayNumber}`,
+        date: assignment.date,
+        startTime: '00:00',
+        endTime: '23:59',
+        description: `Day ${assignment.dayNumber}`,
+        isAllDay: true
+      });
 
-     const schedule = getScheduleForDate(assignment.date);
-     
-     schedule.forEach(period => {
-       let className = '';
-       let description = '';
+      const schedule = getScheduleForDate(assignment.date);
+      
+      schedule.forEach(period => {
+        let className = '';
+        let description = '';
 
-       if (typeof period.id === 'number') {
-         className = daySchedule[period.id];
-         description = `Period ${period.id}`;
-       } else if (period.id === 'break1' || period.id === 'break2') {
-         className = 'Break';
-         description = 'Break Time';
-       } else if (period.id === 'utility') {
-         className = 'Utility';
-         description = 'Utility Period';
-       } else if (assignment.dayOfWeek === 1) {
-         if (period.id === 'homeroom') {
-           className = 'PD';
-           description = 'Professional Development';
-         } else if (period.id === 'meetings') {
-           className = 'Meetings';
-           description = 'Staff Meetings';
-         }
-       } else if (assignment.dayOfWeek === 5 && period.id === 'assembly') {
-         className = 'Assembly';
-         description = 'School Assembly';
-       }
+        if (typeof period.id === 'number') {
+          className = daySchedule[period.id];
+          description = `Period ${period.id}`;
+        } else if (period.id === 'break1' || period.id === 'break2') {
+          className = daySchedule[period.id] || 'Break';
+          description = 'Break Time';
+        } else if (period.id === 'utility') {
+          className = daySchedule[period.id] || 'Utility';
+          description = 'Utility Period';
+        } else if (assignment.dayOfWeek === 1) {
+          if (period.id === 'homeroom') {
+            className = 'PD';
+            description = 'Professional Development';
+          } else if (period.id === 'meetings') {
+            className = 'Meetings';
+            description = 'Staff Meetings';
+          }
+        } else if (assignment.dayOfWeek === 5 && period.id === 'assembly') {
+          className = 'Assembly';
+          description = 'School Assembly';
+        }
 
-       if (className) {
-         addSessionToCSV({
-           className,
-           date: assignment.date,
-           startTime: period.startTime,
-           endTime: period.endTime,
-           description,
-           isAllDay: false
-         });
-       }
-     });
-   }
- });
+        if (className) {
+          addSessionToCSV({
+            className,
+            date: assignment.date,
+            startTime: period.startTime,
+            endTime: period.endTime,
+            description,
+            isAllDay: false
+          });
+        }
+      });
+    }
+  });
 
- function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay }) {
-   const formattedDate = new Date(date).toLocaleDateString('en-US', {
-     month: '2-digit',
-     day: '2-digit',
-     year: 'numeric'
-   });
-   
-   const formatTime = (time24h) => {
-     const [hours, minutes] = time24h.split(':');
-     const date = new Date(2000, 0, 1, hours, minutes);
-     return date.toLocaleTimeString('en-US', {
-       hour: 'numeric',
-       minute: '2-digit',
-       hour12: true
-     });
-   };
+  function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay }) {
+    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+    
+    const formatTime = (time24h) => {
+      const [hours, minutes] = time24h.split(':');
+      const date = new Date(2000, 0, 1, hours, minutes);
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    };
 
-   const row = [
-     className,
-     formattedDate,
-     isAllDay ? '' : formatTime(startTime),
-     formattedDate,
-     isAllDay ? '' : formatTime(endTime),
-     isAllDay ? 'TRUE' : 'FALSE',
-     description,
-     '',
-     'FALSE'
-   ].map(field => `"${field}"`).join(',');
+    const row = [
+      className,
+      formattedDate,
+      isAllDay ? '' : formatTime(startTime),
+      formattedDate,
+      isAllDay ? '' : formatTime(endTime),
+      isAllDay ? 'TRUE' : 'FALSE',
+      description,
+      '',
+      'FALSE'
+    ].map(field => `"${field}"`).join(',');
 
-   csvContent += row + '\n';
- }
+    csvContent += row + '\n';
+  }
 
- try {
-   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-   const url = window.URL.createObjectURL(blob);
-   const a = document.createElement('a');
-   a.href = url;
-   a.download = 'school-timetable.csv';
-   document.body.appendChild(a);
-   a.click();
-   document.body.removeChild(a);
-   window.URL.revokeObjectURL(url);
- } catch (error) {
-   console.error('Download error:', error);
- }
+  try {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'school-timetable.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Download error:', error);
+  }
 };
  
 return (
