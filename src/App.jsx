@@ -230,6 +230,53 @@ const generateAndDownload = () => {
    }
  });
 
+ function addSessionToCSV({ className, date, startTime, endTime, description }) {
+   const formattedDate = new Date(date).toLocaleDateString('en-US', {
+     month: '2-digit',
+     day: '2-digit',
+     year: 'numeric'
+   });
+   
+   const formatTime = (time24h) => {
+     const [hours, minutes] = time24h.split(':');
+     const date = new Date(2000, 0, 1, hours, minutes);
+     return date.toLocaleTimeString('en-US', {
+       hour: 'numeric',
+       minute: '2-digit',
+       hour12: true
+     });
+   };
+
+   const row = [
+     className,
+     formattedDate,
+     formatTime(startTime),
+     formattedDate,
+     formatTime(endTime),
+     'FALSE',
+     description,
+     '',
+     'FALSE'
+   ].map(field => `"${field}"`).join(',');
+
+   csvContent += row + '\n';
+ }
+
+ try {
+   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+   const url = window.URL.createObjectURL(blob);
+   const a = document.createElement('a');
+   a.href = url;
+   a.download = 'school-timetable.csv';
+   document.body.appendChild(a);
+   a.click();
+   document.body.removeChild(a);
+   window.URL.revokeObjectURL(url);
+ } catch (error) {
+   console.error('Download error:', error);
+ }
+};
+
 return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto p-4 space-y-8">
