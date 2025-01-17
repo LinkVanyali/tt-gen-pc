@@ -42,6 +42,22 @@ const FRIDAY_SCHEDULE = [
   { id: 'assembly', name: 'Assembly', startTime: '13:20', endTime: '14:35', duration: '75 min' },
 ];
 
+const PREDEFINED_DAY_NUMBERS = [
+  // January - Two Day 7s
+  ['2025-01-28', 7],
+  ['2025-01-29', 7],
+  
+  // February - Three No Schedule days
+  ['2025-02-19', 0],
+  ['2025-02-20', 0],
+  ['2025-02-21', 0],
+  
+  // March - One No Schedule day
+  ['2025-03-21', 0]
+];
+
+const DAY_NUMBER_MAP = new Map(PREDEFINED_DAY_NUMBERS);
+
 // Helper function to get schedule based on day
 const getScheduleForDate = (date) => {
   const dayOfWeek = new Date(date).getDay();
@@ -74,49 +90,59 @@ function App() {
     return day !== 0 && day !== 6;
   };
 
-  const generateWeekdays = (start, end) => {
-    const dates = [];
-    const currentDate = new Date(start);
-    const endDate = new Date(end);
-    let currentDayNumber = 1;
-    let currentWeek = [];
-    let weekNumber = 1;
-
-    // Adjust start date to Monday if it's not already
-    const startDayOfWeek = currentDate.getDay();
-    if (startDayOfWeek !== 1) {
-      if (startDayOfWeek === 0) {
-        currentDate.setDate(currentDate.getDate() + 1);
-      } else {
-        currentDate.setDate(currentDate.getDate() - (startDayOfWeek - 1));
-      }
-    }
+ const generateWeekdays = (start, end) => {
+   const dates = [];
+   const currentDate = new Date(start);
+   const endDate = new Date(end);
+   let currentDayNumber = 1;
+   let currentWeek = [];
+   let weekNumber = 1;
+ 
+   // Adjust start date to Monday if it's not already
+   const startDayOfWeek = currentDate.getDay();
+   if (startDayOfWeek !== 1) {
+     if (startDayOfWeek === 0) {
+       currentDate.setDate(currentDate.getDate() + 1);
+     } else {
+       currentDate.setDate(currentDate.getDate() - (startDayOfWeek - 1));
+     }
+   }
 
     while (currentDate <= endDate) {
-      if (isWeekday(currentDate)) {
-        const dayInfo = {
-          date: currentDate.toISOString().split('T')[0],
-          dayNumber: currentDayNumber,
-          dayOfWeek: currentDate.getDay(),
-          dayName: new Date(currentDate).toLocaleDateString('en-US', { weekday: 'long' }),
-          weekNumber: weekNumber
-        };
-        
-        currentWeek.push(dayInfo);
+    if (isWeekday(currentDate)) {
+      const dateString = currentDate.toISOString().split('T')[0];
+      // Check if we have a predefined day number for this date
+      const predefinedDayNumber = DAY_NUMBER_MAP.get(dateString);
+      
+      const dayInfo = {
+        date: dateString,
+        dayNumber: predefinedDayNumber || currentDayNumber,
+        dayOfWeek: currentDate.getDay(),
+        dayName: new Date(currentDate).toLocaleDateString('en-US', { weekday: 'long' }),
+        weekNumber: weekNumber
+      };
+      
+      currentWeek.push(dayInfo);
+      // Only increment currentDayNumber if we didn't use a predefined number
+      if (!predefinedDayNumber) {
         currentDayNumber = currentDayNumber === 7 ? 1 : currentDayNumber + 1;
-        
-        if (currentDate.getDay() === 5 || currentDate >= endDate) {
-          if (currentWeek.length > 0) {
-            dates.push(...currentWeek);
-            currentWeek = [];
-            weekNumber++;
-          }
+      } else {
+        // If we used a predefined number, set currentDayNumber for next iteration
+        currentDayNumber = predefinedDayNumber === 7 ? 1 : predefinedDayNumber + 1;
+      }
+      
+      if (currentDate.getDay() === 5 || currentDate >= endDate) {
+        if (currentWeek.length > 0) {
+          dates.push(...currentWeek);
+          currentWeek = [];
+          weekNumber++;
         }
       }
-      currentDate.setDate(currentDate.getDate() + 1);
     }
-    return dates;
-  };
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return dates;
+};
 
 // Event generation functions
   const handleDateRangeChange = (field, value) => {
@@ -129,7 +155,7 @@ function App() {
     }
   };
 
-const updateDayNumber = (index, dayNumber) => {
+/*const updateDayNumber = (index, dayNumber) => {
   const confirmed = dayNumber === 0 || window.confirm(
     `This will update day numbers for all subsequent dates in sequence. Continue?`
   );
@@ -149,7 +175,7 @@ const updateDayNumber = (index, dayNumber) => {
       return newAssignments;
     });
   }
-};
+};*/
   
 const generateAndDownload = () => {
   let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
@@ -368,7 +394,7 @@ return (
                             {scheduleType}
                           </td>
                           <td className="border border-gray-200 p-2">
-                            <select
+                            <!-- <select
                               value={assignment.dayNumber}
                               onChange={(e) => updateDayNumber(index, parseInt(e.target.value))}
                               className="w-full p-1 border rounded"
@@ -377,7 +403,7 @@ return (
                               {[1, 2, 3, 4, 5, 6, 7].map(day => (
                                 <option key={day} value={day}>Day {day}</option>
                               ))}
-                            </select>
+                            </select> -->
                           </td>
                         </tr>
                       );
