@@ -1,15 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
-
-//create storage key for persistent data using localstorage
-const STORAGE_KEY = 'savedSchedules';
-
-//sets the sechedules below to the default schedules structure
-const DEFAULT_SCHEDULES = {
-  monday: MONDAY_SCHEDULE,
-  friday: FRIDAY_SCHEDULE,
-  regular: REGULAR_SCHEDULE
-};
 
 // Schedule definitions
 const MONDAY_SCHEDULE = [
@@ -52,6 +42,16 @@ const FRIDAY_SCHEDULE = [
   { id: 'assembly', name: 'Assembly', startTime: '13:20', endTime: '14:35', duration: '75 min' },
 ];
 
+//create storage key for persistent data using localstorage
+const STORAGE_KEY = 'savedSchedules';
+
+//sets the sechedules below to the default schedules structure
+const DEFAULT_SCHEDULES = {
+  monday: MONDAY_SCHEDULE,
+  friday: FRIDAY_SCHEDULE,
+  regular: REGULAR_SCHEDULE
+};
+
 //function to actually sav data to localstorage
 const saveToLocalStorage = (schedules) => {
   try {
@@ -61,7 +61,6 @@ const saveToLocalStorage = (schedules) => {
   }
 };
 
-<<<<<<< HEAD
 //function to actually save data to localstorage
 const loadFromLocalStorage = () => {
   try {
@@ -94,19 +93,6 @@ const updateSchedule = (dayType, newSchedule) => {
 };
 
 
-=======
-const initializeTimetable = () => {
-  const days = {};
-  for (let day = 1; day <= 7; day++) {
-    days[day] = {};
-    REGULAR_SCHEDULE.forEach(Lesson => {
-      days[day][Lesson.id] = '';
-    });
-  }
-  return days;
-};
-
->>>>>>> origin/LinkVanyali-localstorage-1
 function App() {
   const [schedules, setSchedules] = useState(() => loadFromLocalStorage());
 
@@ -197,8 +183,8 @@ function App() {
   };
 
 const updateDayNumber = (index, dayNumber) => {
-  const confirmed = dayNumber === 0 || window.confirm(
-    `This will update day numbers for all subsequent dates in sequence. Continue?`
+  const confirmed = window.confirm(
+    'This will update the day numbers for all subsequent dates. Continue?'
   );
   
   if (confirmed) {
