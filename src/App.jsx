@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { Download } from 'lucide-react';
 
+//create storage key for persistent data using localstorage
+const STORAGE_KEY = 'savedSchedules';
+
+//sets the sechedules below to the default schedules structure
+const DEFAULT_SCHEDULES = {
+  monday: MONDAY_SCHEDULE,
+  friday: FRIDAY_SCHEDULE,
+  regular: REGULAR_SCHEDULE
+};
+
 // Schedule definitions
 const MONDAY_SCHEDULE = [
  { id: 'homeroom', name: 'Homerooms', startTime: '07:50', endTime: '08:30', duration: '40 min' },
@@ -42,15 +52,50 @@ const FRIDAY_SCHEDULE = [
   { id: 'assembly', name: 'Assembly', startTime: '13:20', endTime: '14:35', duration: '75 min' },
 ];
 
-// Helper function to get schedule based on day
-const getScheduleForDate = (date) => {
-  const dayOfWeek = new Date(date).getDay();
-  if (dayOfWeek === 1) return MONDAY_SCHEDULE;
-  if (dayOfWeek === 5) return FRIDAY_SCHEDULE;
-  return REGULAR_SCHEDULE;
+//function to actually sav data to localstorage
+const saveToLocalStorage = (schedules) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(schedules));
+  } catch (error) {
+    console.error('Error saving to localStorage:', error);
+  }
 };
 
+//function to actually save data to localstorage
+const loadFromLocalStorage = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_SCHEDULES;
+  } catch (error) {
+    console.error('Error loading from localStorage:', error);
+    return DEFAULT_SCHEDULES;
+  }
+};
+
+// Helper function to get schedule based on day and use local storage
+const getScheduleForDate = (date) => {
+  const schedules = loadFromLocalStorage();
+  const dayOfWeek = new Date(date).getDay();
+  
+  if (dayOfWeek === 1) return schedules.monday;
+  if (dayOfWeek === 5) return schedules.friday;
+  return schedules.regular;
+};
+
+//function to update schedules in localstorage
+const updateSchedule = (dayType, newSchedule) => {
+  const currentSchedules = loadFromLocalStorage();
+  const updatedSchedules = {
+    ...currentSchedules,
+    [dayType]: newSchedule
+  };
+  saveToLocalStorage(updatedSchedules);
+};
+
+
 function App() {
+  const [schedules, setSchedules] = useState(() => loadFromLocalStorage());
+
   const [timetable, setTimetable] = useState(() => {
   const days = {};
   for (let day = 1; day <= 7; day++) {
@@ -257,6 +302,18 @@ const generateAndDownload = () => {
   }
 };
  
+// Call this when you need to update a schedule
+const handleScheduleUpdate = (dayType, newSchedule) => {
+  setSchedules(prev => {
+    const updated = {
+      ...prev,
+      [dayType]: newSchedule
+    };
+    saveToLocalStorage(updated);
+    return updated;
+  });
+};
+
 return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto p-4 space-y-8">
