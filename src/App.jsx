@@ -322,11 +322,42 @@ const handleScheduleUpdate = (dayType, newSchedule) => {
   });
 };
 
+// Add this new function near your other handlers
+const handleClearCalendar = () => {
+  const confirmed = window.confirm(
+    'This will clear all timetable entries. Are you sure you want to continue?'
+  );
+  
+  if (confirmed) {
+    // Create empty timetable structure
+    const emptyTimetable = {};
+    for (let day = 1; day <= 7; day++) {
+      emptyTimetable[day] = {};
+      REGULAR_SCHEDULE.forEach(Lesson => {
+        emptyTimetable[day][Lesson.id] = '';
+      });
+    }
+    
+    // Reset states
+    setTimetable(emptyTimetable);
+    setDateRange({ startDate: '', endDate: '' });
+    setDateAssignments([]);
+  }
+};
+
 return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto p-4 space-y-8">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-6">School Timetable Generator</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">School Timetable Generator</h2>
+            <button
+              onClick={handleClearCalendar}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Clear Calendar
+            </button>
+          </div>
           
           {/* Timetable Grid */}
           <div className="overflow-x-auto mb-8">
