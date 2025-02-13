@@ -92,6 +92,15 @@ const updateSchedule = (dayType, newSchedule) => {
   saveToLocalStorage(updatedSchedules);
 };
 
+// Helper function for formatting class names (add this outside the component)
+const formatClassName = (input) => {
+  // Split by spaces and capitalize each word
+  return input
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .trim();
+};
 
 function App() {
   const [schedules, setSchedules] = useState(() => loadFromLocalStorage());
@@ -121,13 +130,14 @@ function App() {
 
  useEffect(() => {
   localStorage.setItem('timetableTemplates', JSON.stringify(timetable));
-  // Show "Saving..." without tick
   setSaveStatus({ text: 'Saving...', showTick: false });
   
-  // After a short delay, show "All changes saved" with tick
-  setTimeout(() => {
+  // Add a delay before showing "saved" status
+  const saveTimer = setTimeout(() => {
     setSaveStatus({ text: 'All changes saved', showTick: true });
-  }, 1000);
+  }, 1000); // 1 second delay
+
+  return () => clearTimeout(saveTimer); // Cleanup timeout
  }, [timetable]);
 
   const isWeekday = (date) => {
@@ -359,19 +369,20 @@ return (
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">School Timetable Generator</h2>
-            <button
-              onClick={handleClearCalendar}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-              Clear Calendar
-            </button>
-          </div>
-          
-          <div className="text-sm text-gray-500 text-right mb-4 flex items-center justify-end gap-1">
-            {saveStatus.text}
-            {saveStatus.showTick && (
-              <Check className="w-4 h-4 text-green-500" />
-            )}
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-500 flex items-center gap-1">
+                {saveStatus.text}
+                {saveStatus.showTick && (
+                  <Check className="w-4 h-4 text-green-500" />
+                )}
+              </div>
+              <button
+                onClick={handleClearCalendar}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Clear Calendar
+              </button>
+            </div>
           </div>
           
           {/* Timetable Grid */}
@@ -402,10 +413,68 @@ return (
                         value={timetable[day][Lesson.id] || ''}
                         onChange={(e) => {
                           const newTimetable = { ...timetable };
-                          newTimetable[day][Lesson.id] = e.target.value;
+                          // Format and validate input
+                          const formattedValue = formatClassName(e.target.value);
+                          // Optional: Limit length to prevent overly long names
+                          newTimetable[day][Lesson.id] = formattedValue.slice(0, 30);
                           setTimetable(newTimetable);
                         }}
-                        className="w-full p-1 border rounded"
+                        onKeyDown={(e) => {
+                          // Vertical navigation (existing)
+                          if (e.key === 'Enter' || e.key === 'ArrowDown') {
+                            const nextInput = e.target.closest('td').parentElement.nextElementSibling?.querySelector('input');
+                            if (nextInput) {
+                              nextInput.focus();
+                              e.preventDefault();
+                            }
+                          } else if (e.key === 'ArrowUp') {
+                            const prevInput = e.target.closest('td').parentElement.previousElementSibling?.querySelector('input');
+                            if (prevInput) {
+                              prevInput.focus();
+                              e.preventDefault();
+                            }
+                          }
+                          // Horizontal navigation (new)
+                          else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                            const currentCell = e.target.closest('td');
+                            const currentIndex = Array.from(currentCell.parentElement.children).indexOf(currentCell);
+                            const targetIndex = e.key === 'ArrowLeft' ? currentIndex - 1 : currentIndex + 1;
+                            
+                            if (targetIndex >= 0 && targetIndex < 8) { // 8 is total columns (1 for lesson name + 7 days)
+                              const nextInput = currentCell.parentElement.children[targetIndex].querySelector('input');
+                              if (nextInput) {
+                                nextInput.focus();
+                                e.preventDefault();
+                              }
+                            }
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Clean up value on blur (remove extra spaces, etc)
+                          const newTimetable = { ...timetable };
+                          const cleanValue = formatClassName(e.target.value);
+                          if (cleanValue !== e.target.value) {
+                            newTimetable[day][Lesson.id] = cleanValue;
+                            setTimetable(newTimetable);
+                          }
+                        }}
+                        onPaste={(e) => {
+                          // Handle pasted content
+                          e.preventDefault();
+                          const pastedText = e.clipboardData.getData('text');
+                          const formattedText = formatClassName(pastedText);
+                          const newTimetable = { ...timetable };
+                          newTimetable[day][Lesson.id] = formattedText;
+                          setTimetable(newTimetable);
+                        }}
+                        className="w-full p-1 border rounded 
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          hover:bg-gray-50 transition-colors duration-150
+                          invalid:border-red-500 invalid:ring-red-500"
+                        autoComplete="off"
+                        spellCheck="false"
+                        maxLength="30"
+                        placeholder={`Day ${day}`}
                       />
                     </td>
                     ))}
