@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Check } from 'lucide-react';
 
 // Schedule definitions
 const MONDAY_SCHEDULE = [
@@ -95,6 +95,7 @@ const updateSchedule = (dayType, newSchedule) => {
 
 function App() {
   const [schedules, setSchedules] = useState(() => loadFromLocalStorage());
+  const [saveStatus, setSaveStatus] = useState({ text: 'All changes saved', showTick: true });
 
   const [timetable, setTimetable] = useState(() => {
   const saved = localStorage.getItem('timetableTemplates');
@@ -120,6 +121,13 @@ function App() {
 
  useEffect(() => {
   localStorage.setItem('timetableTemplates', JSON.stringify(timetable));
+  // Show "Saving..." without tick
+  setSaveStatus({ text: 'Saving...', showTick: false });
+  
+  // After a short delay, show "All changes saved" with tick
+  setTimeout(() => {
+    setSaveStatus({ text: 'All changes saved', showTick: true });
+  }, 1000);
  }, [timetable]);
 
   const isWeekday = (date) => {
@@ -357,6 +365,13 @@ return (
             >
               Clear Calendar
             </button>
+          </div>
+          
+          <div className="text-sm text-gray-500 text-right mb-4 flex items-center justify-end gap-1">
+            {saveStatus.text}
+            {saveStatus.showTick && (
+              <Check className="w-4 h-4 text-green-500" />
+            )}
           </div>
           
           {/* Timetable Grid */}
