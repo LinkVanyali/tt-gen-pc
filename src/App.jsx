@@ -474,7 +474,6 @@ return (
                         autoComplete="off"
                         spellCheck="false"
                         maxLength="30"
-                        placeholder={`Day ${day}`}
                       />
                     </td>
                     ))}
