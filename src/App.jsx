@@ -3,30 +3,31 @@ import { Download, Check } from 'lucide-react';
 
 // Schedule definitions
 const MONDAY_SCHEDULE = [
- { id: 'homeroom', name: 'Homerooms', startTime: '07:50', endTime: '08:30', duration: '40 min' },
- { id: 1, name: 'Lesson 1', startTime: '08:35', endTime: '09:10', duration: '35 min' },
- { id: 2, name: 'Lesson 2', startTime: '09:15', endTime: '09:50', duration: '35 min' },
- { id: 3, name: 'Lesson 3', startTime: '09:55', endTime: '10:30', duration: '35 min' },
- { id: 'utility', name: 'Meeting/Utility', startTime: '10:30', endTime: '10:55', duration: '25 min' },
- { id: 'break1', name: 'Break', startTime: '10:55', endTime: '11:15', duration: '20 min' },
- { id: 4, name: 'Lesson 4', startTime: '11:15', endTime: '11:55', duration: '35 min' },
- { id: 5, name: 'Lesson 5', startTime: '12:00', endTime: '12:35', duration: '35 min' },
- { id: 'break2', name: 'Break', startTime: '12:40', endTime: '13:10', duration: '30 min' },
- { id: 6, name: 'Lesson 6', startTime: '13:10', endTime: '13:50', duration: '40 min' },
- { id: 7, name: 'Lesson 7', startTime: '13:55', endTime: '14:35', duration: '40 min' }
+ { id: 'homeroom', name: 'Homerooms PD', startTime: '07:30', endTime: '08:15', duration: '45 min' },
+ { id: 'lines', name: 'Lines', startTime: '08:10', endTime: '08:20', duration: '10 min' },
+ { id: 1, name: 'Lesson 1', startTime: '08:25', endTime: '09:00', duration: '35 min' },
+ { id: 2, name: 'Lesson 2', startTime: '09:05', endTime: '09:40', duration: '35 min' },
+ { id: 3, name: 'Lesson 3', startTime: '09:45', endTime: '10:20', duration: '35 min' },
+ { id: 'break1', name: 'Break', startTime: '10:20', endTime: '10:50', duration: '30 min' },
+ { id: 4, name: 'Lesson 4', startTime: '10:55', endTime: '11:30', duration: '35 min' },
+ { id: 5, name: 'Lesson 5', startTime: '11:35', endTime: '12:10', duration: '35 min' },
+ { id: 'meetings', name: 'Meetings', startTime: '12:15', endTime: '12:45', duration: '30 min' },
+ { id: 'break2', name: 'Break', startTime: '12:45', endTime: '13:15', duration: '30 min' },
+ { id: 6, name: 'Lesson 6', startTime: '13:20', endTime: '13:55', duration: '35 min' },
+ { id: 7, name: 'Lesson 7', startTime: '14:00', endTime: '14:35', duration: '35 min' }
 ];
 
 const REGULAR_SCHEDULE = [
-  { id: 1, name: 'Lesson 1', startTime: '07:50', endTime: '08:35', duration: '45 min' },
-  { id: 2, name: 'Lesson 2', startTime: '08:40', endTime: '09:25', duration: '45 min' },
-  { id: 3, name: 'Lesson 3', startTime: '09:30', endTime: '10:15', duration: '45 min' },
-  { id: 'utility', name: 'Utility', startTime: '10:15', endTime: '10:45', duration: '30 min' },
+  { id: 1, name: 'Lesson 1', startTime: '07:50', endTime: '08:30', duration: '40 min' },
+  { id: 2, name: 'Lesson 2', startTime: '08:35', endTime: '09:15', duration: '40 min' },
+  { id: 3, name: 'Lesson 3', startTime: '09:20', endTime: '10:00', duration: '40 min' },
+  { id: 'utility', name: 'Utility', startTime: '10:05', endTime: '10:45', duration: '40 min' },
   { id: 'break1', name: 'Break', startTime: '10:45', endTime: '11:05', duration: '20 min' },
-  { id: 4, name: 'Lesson 4', startTime: '11:05', endTime: '11:50', duration: '45 min' },
+  { id: 4, name: 'Lesson 4', startTime: '11:10', endTime: '11:50', duration: '40 min' },
   { id: 5, name: 'Lesson 5', startTime: '11:55', endTime: '12:35', duration: '40 min' },
   { id: 'break2', name: 'Break', startTime: '12:35', endTime: '13:05', duration: '30 min' },
-  { id: 6, name: 'Lesson 6', startTime: '13:05', endTime: '13:45', duration: '40 min' },
-  { id: 7, name: 'Lesson 7', startTime: '13:50', endTime: '14:35', duration: '45 min' },
+  { id: 6, name: 'Lesson 6', startTime: '13:10', endTime: '13:50', duration: '40 min' },
+  { id: 7, name: 'Lesson 7', startTime: '13:55', endTime: '14:35', duration: '40 min' }
 ];
 
 const FRIDAY_SCHEDULE = [
@@ -34,12 +35,12 @@ const FRIDAY_SCHEDULE = [
   { id: 2, name: 'Lesson 2', startTime: '08:30', endTime: '09:05', duration: '35 min' },
   { id: 3, name: 'Lesson 3', startTime: '09:10', endTime: '09:45', duration: '35 min' },
   { id: 'break1', name: 'Break', startTime: '09:45', endTime: '10:15', duration: '30 min' },
-  { id: 4, name: 'Lesson 4', startTime: '10:15', endTime: '10:55', duration: '35 min' },
+  { id: 4, name: 'Lesson 4', startTime: '10:20', endTime: '10:55', duration: '35 min' },
   { id: 5, name: 'Lesson 5', startTime: '11:00', endTime: '11:35', duration: '35 min' },
   { id: 'break2', name: 'Break', startTime: '11:35', endTime: '12:05', duration: '30 min' },
-  { id: 6, name: 'Lesson 6', startTime: '12:05', endTime: '12:40', duration: '35 min' },
-  { id: 7, name: 'Lesson 7', startTime: '12:45', endTime: '13:20', duration: '35 min' },
-  { id: 'assembly', name: 'Assembly', startTime: '13:20', endTime: '14:35', duration: '75 min' },
+  { id: 6, name: 'Lesson 6', startTime: '12:10', endTime: '12:45', duration: '35 min' },
+  { id: 7, name: 'Lesson 7', startTime: '12:50', endTime: '13:25', duration: '35 min' },
+  { id: 'assembly', name: 'Assembly', startTime: '13:30', endTime: '14:30', duration: '60 min' }
 ];
 
 //create storage key for persistent data using localstorage
@@ -413,10 +414,8 @@ return (
                         value={timetable[day][Lesson.id] || ''}
                         onChange={(e) => {
                           const newTimetable = { ...timetable };
-                          // Format and validate input
-                          const formattedValue = formatClassName(e.target.value);
-                          // Optional: Limit length to prevent overly long names
-                          newTimetable[day][Lesson.id] = formattedValue.slice(0, 30);
+                          // Allow natural typing without immediate formatting
+                          newTimetable[day][Lesson.id] = e.target.value.slice(0, 30);
                           setTimetable(newTimetable);
                         }}
                         onKeyDown={(e) => {
