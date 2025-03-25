@@ -93,16 +93,6 @@ const updateSchedule = (dayType, newSchedule) => {
   saveToLocalStorage(updatedSchedules);
 };
 
-// Helper function for formatting class names (add this outside the component)
-const formatClassName = (input) => {
-  // Split by spaces and capitalize each word
-  return input
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
-    .trim();
-};
-
 function App() {
   const [schedules, setSchedules] = useState(() => loadFromLocalStorage());
   const [saveStatus, setSaveStatus] = useState({ text: 'All changes saved', showTick: true });
@@ -414,8 +404,7 @@ return (
                         value={timetable[day][Lesson.id] || ''}
                         onChange={(e) => {
                           const newTimetable = { ...timetable };
-                          // Allow natural typing without immediate formatting
-                          newTimetable[day][Lesson.id] = e.target.value.slice(0, 30);
+                          newTimetable[day][Lesson.id] = e.target.value;
                           setTimetable(newTimetable);
                         }}
                         onKeyDown={(e) => {
@@ -448,22 +437,11 @@ return (
                             }
                           }
                         }}
-                        onBlur={(e) => {
-                          // Clean up value on blur (remove extra spaces, etc)
-                          const newTimetable = { ...timetable };
-                          const cleanValue = formatClassName(e.target.value);
-                          if (cleanValue !== e.target.value) {
-                            newTimetable[day][Lesson.id] = cleanValue;
-                            setTimetable(newTimetable);
-                          }
-                        }}
                         onPaste={(e) => {
-                          // Handle pasted content
                           e.preventDefault();
                           const pastedText = e.clipboardData.getData('text');
-                          const formattedText = formatClassName(pastedText);
                           const newTimetable = { ...timetable };
-                          newTimetable[day][Lesson.id] = formattedText;
+                          newTimetable[day][Lesson.id] = pastedText;
                           setTimetable(newTimetable);
                         }}
                         className="w-full p-1 border rounded 
@@ -472,7 +450,6 @@ return (
                           invalid:border-red-500 invalid:ring-red-500"
                         autoComplete="off"
                         spellCheck="false"
-                        maxLength="30"
                       />
                     </td>
                     ))}
