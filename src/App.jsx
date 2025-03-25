@@ -404,7 +404,7 @@ return (
                 {REGULAR_SCHEDULE.map(Lesson => (
                   <tr key={Lesson.id} className={typeof Lesson.id === 'string' ? 'bg-gray-50' : ''}>
                     <td className="border border-gray-200 p-2 font-medium">{Lesson.name}</td>
-                    <td className="border border-gray-200 p-2 text-sm">
+                    <td className="border border-gray-200 p-2 text-sm whitespace-nowrap">
                       {Lesson.startTime} - {Lesson.endTime}
                     </td>
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
