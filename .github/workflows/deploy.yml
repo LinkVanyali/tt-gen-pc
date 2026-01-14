@@ -1,5 +1,8 @@
 name: Deploy to Pages
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: ["main"]
