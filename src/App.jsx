@@ -3,18 +3,18 @@ import { Download, Check } from 'lucide-react';
 
 // Schedule definitions
 const MONDAY_SCHEDULE = [
- { id: 'homeroom', name: 'Homerooms PD', startTime: '07:30', endTime: '08:15', duration: '45 min' },
- { id: 'lines', name: 'Lines', startTime: '08:10', endTime: '08:20', duration: '10 min' },
- { id: 1, name: 'Lesson 1', startTime: '08:25', endTime: '09:00', duration: '35 min' },
- { id: 2, name: 'Lesson 2', startTime: '09:05', endTime: '09:40', duration: '35 min' },
- { id: 3, name: 'Lesson 3', startTime: '09:45', endTime: '10:20', duration: '35 min' },
- { id: 'break1', name: 'Break', startTime: '10:20', endTime: '10:50', duration: '30 min' },
- { id: 4, name: 'Lesson 4', startTime: '10:55', endTime: '11:30', duration: '35 min' },
- { id: 5, name: 'Lesson 5', startTime: '11:35', endTime: '12:10', duration: '35 min' },
- { id: 'meetings', name: 'Meetings', startTime: '12:15', endTime: '12:45', duration: '30 min' },
- { id: 'break2', name: 'Break', startTime: '12:45', endTime: '13:15', duration: '30 min' },
- { id: 6, name: 'Lesson 6', startTime: '13:20', endTime: '13:55', duration: '35 min' },
- { id: 7, name: 'Lesson 7', startTime: '14:00', endTime: '14:35', duration: '35 min' }
+  { id: 'homeroom', name: 'Homerooms PD', startTime: '07:30', endTime: '08:15', duration: '45 min' },
+  { id: 'lines', name: 'Lines', startTime: '08:10', endTime: '08:20', duration: '10 min' },
+  { id: 1, name: 'Lesson 1', startTime: '08:25', endTime: '09:00', duration: '35 min' },
+  { id: 2, name: 'Lesson 2', startTime: '09:05', endTime: '09:40', duration: '35 min' },
+  { id: 3, name: 'Lesson 3', startTime: '09:45', endTime: '10:20', duration: '35 min' },
+  { id: 'break1', name: 'Break', startTime: '10:20', endTime: '10:50', duration: '30 min' },
+  { id: 4, name: 'Lesson 4', startTime: '10:55', endTime: '11:30', duration: '35 min' },
+  { id: 5, name: 'Lesson 5', startTime: '11:35', endTime: '12:10', duration: '35 min' },
+  { id: 'meetings', name: 'Meetings', startTime: '12:15', endTime: '12:45', duration: '30 min' },
+  { id: 'break2', name: 'Break', startTime: '12:45', endTime: '13:15', duration: '30 min' },
+  { id: 6, name: 'Lesson 6', startTime: '13:20', endTime: '13:55', duration: '35 min' },
+  { id: 7, name: 'Lesson 7', startTime: '14:00', endTime: '14:35', duration: '35 min' }
 ];
 
 const REGULAR_SCHEDULE = [
@@ -215,20 +215,47 @@ const updateDayNumber = (index, dayNumber) => {
   
 const generateAndDownload = () => {
   let csvContent = 'Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n';
+
+  // Helper function defined inside to access csvContent closure
+  function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay }) {
+    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+    
+    const formatTime = (time24h) => {
+      if (!time24h) return '';
+      const [hours, minutes] = time24h.split(':');
+      const date = new Date(2000, 0, 1, hours, minutes);
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    };
+
+    const row = [
+      className,
+      formattedDate,
+      isAllDay ? '' : formatTime(startTime),
+      formattedDate,
+      isAllDay ? '' : formatTime(endTime),
+      isAllDay ? 'TRUE' : 'FALSE',
+      description,
+      '',
+      'FALSE'
+    ].map(field => `"${field}"`).join(',');
+
+    csvContent += row + '\n';
+  }
   
   dateAssignments.forEach(assignment => {
     if (assignment.dayNumber === 0) return;
     
     const daySchedule = timetable[assignment.dayNumber];
     if (daySchedule) {
-      addSessionToCSV({
-        className: `Day ${assignment.dayNumber}`,
-        date: assignment.date,
-        startTime: '00:00',
-        endTime: '23:59',
-        description: `Day ${assignment.dayNumber}`,
-        isAllDay: true
-      });
+      // Day X all-day event removed from here
 
       const schedule = getScheduleForDate(assignment.date);
       
@@ -271,38 +298,6 @@ const generateAndDownload = () => {
       });
     }
   });
-
-  function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay }) {
-    const formattedDate = new Date(date).toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric'
-    });
-    
-    const formatTime = (time24h) => {
-      const [hours, minutes] = time24h.split(':');
-      const date = new Date(2000, 0, 1, hours, minutes);
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-    };
-
-    const row = [
-      className,
-      formattedDate,
-      isAllDay ? '' : formatTime(startTime),
-      formattedDate,
-      isAllDay ? '' : formatTime(endTime),
-      isAllDay ? 'TRUE' : 'FALSE',
-      description,
-      '',
-      'FALSE'
-    ].map(field => `"${field}"`).join(',');
-
-    csvContent += row + '\n';
-  }
 
   try {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
