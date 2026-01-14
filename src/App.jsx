@@ -218,17 +218,6 @@ const generateAndDownload = () => {
   
   dateAssignments.forEach(assignment => {
     if (assignment.dayNumber === 0) return;
-    
-    const daySchedule = timetable[assignment.dayNumber];
-    if (daySchedule) {
-      addSessionToCSV({
-        className: `Day ${assignment.dayNumber}`,
-        date: assignment.date,
-        startTime: '00:00',
-        endTime: '23:59',
-        description: `Day ${assignment.dayNumber}`,
-        isAllDay: true
-      });
 
       const schedule = getScheduleForDate(assignment.date);
       
