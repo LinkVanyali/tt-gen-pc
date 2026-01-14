@@ -259,7 +259,7 @@ const generateAndDownload = () => {
         }
       });
     }
-  });
+  );
 
   function addSessionToCSV({ className, date, startTime, endTime, description, isAllDay }) {
     const formattedDate = new Date(date).toLocaleDateString('en-US', {
